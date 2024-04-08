@@ -4,7 +4,7 @@ const db = require('./db');
 
 // Obtener todos los usuarios
 router.get('/users', (req, res) => {
-  db.query('SELECT * FROM Users', (err, rows) => {
+  db.query('SELECT * FROM users', (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
