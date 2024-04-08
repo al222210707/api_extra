@@ -1,13 +1,16 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const routes = require('./routes');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
-app.use(bodyParser.json());
+// Middleware para procesar JSON
+app.use(express.json());
+
+// Usar las rutas definidas en routes.js
 app.use('/api', routes);
 
+// Iniciar el servidor
 app.listen(PORT, () => {
-  console.log(`Servidor API corriendo en http://localhost:${PORT}`); 
+  console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });
