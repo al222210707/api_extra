@@ -13,6 +13,16 @@ router.get('/users', (req, res) => {
   });
 });
 
+// Obtener todas las mediciones de consumo de energía
+router.get('/mediciones', (req, res) => {
+  db.query('SELECT * FROM consumptiondata', (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ consumptionData: rows });
+  });
+});
 // Obtener un usuario por su ID
 router.get('/users/:id', (req, res) => {
   const id = req.params.id;
