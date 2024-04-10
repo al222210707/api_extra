@@ -4,13 +4,18 @@ const db = require('./db');
 
 // Obtener todos los usuarios
 router.get('/users', (req, res) => {
-  db.query('SELECT * FROM users', (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json({ users: rows });
-  });
+  try {
+    db.query('SELECT * FROM users', (err, rows) => {
+      if (err) {
+        // Manejar el error apropiadamente, por ejemplo, lanzando una excepción o emitiendo un evento de error
+        throw err;
+      }
+      res.json({ users: rows });
+    });
+  } catch (error) {
+    console.error('Error al obtener usuarios:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 });
 
 // Obtener todas las mediciones de consumo de energía
@@ -23,6 +28,7 @@ router.get('/mediciones', (req, res) => {
     res.json({ consumptionData: rows });
   });
 });
+
 // Obtener un usuario por su ID
 router.get('/users/:id', (req, res) => {
   const id = req.params.id;
