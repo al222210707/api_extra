@@ -8,11 +8,9 @@ const db = mysql.createConnection({
 });
 db.connect((err) => {
   if (err) {
-    console.error('Error al conectar con la base de datos:', err);
-    // Manejar el error apropiadamente, por ejemplo, lanzar una excepción o emitir un evento de error
-  } else {
-    console.log('MySQL connected');
+    
   }
+  console.log('MySQL connected');
 });
 
 module.exports = db;
