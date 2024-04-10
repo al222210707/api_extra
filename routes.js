@@ -2,30 +2,27 @@ const express = require('express');
 const router = express.Router();
 const db = require('./db');
 
-// Manejo de errores para consultas a la base de datos
-db.on('error', (err) => {
-  console.error('Error en la conexión a la base de datos:', err);
-  // Aquí puedes manejar el error de la conexión de base de datos
-});
-
 // Obtener todos los usuarios
 router.get('/users', (req, res) => {
-  db.query('SELECT * FROM users', (err, rows) => {
-    if (err) {
-      console.error('Error al obtener usuarios:', err);
-      res.status(500).json({ error: 'Error al obtener usuarios: ' + err.message });
-      return;
-    }
-    res.json({ users: rows });
-  });
+  try {
+    db.query('SELECT * FROM users', (err, rows) => {
+      if (err) {
+        // Manejar el error apropiadamente, por ejemplo, lanzando una excepción o emitiendo un evento de error
+        throw err;
+      }
+      res.json({ users: rows });
+    });
+  } catch (error) {
+    console.error('Error al obtener usuarios:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 });
 
 // Obtener todas las mediciones de consumo de energía
 router.get('/mediciones', (req, res) => {
   db.query('SELECT * FROM consumptiondata', (err, rows) => {
     if (err) {
-      console.error('Error al obtener mediciones de consumo:', err);
-      res.status(500).json({ error: 'Error al obtener mediciones de consumo: ' + err.message });
+      res.status(500).json({ error: err.message });
       return;
     }
     res.json({ consumptionData: rows });
@@ -37,8 +34,7 @@ router.get('/users/:id', (req, res) => {
   const id = req.params.id;
   db.query('SELECT * FROM Users WHERE id_user = ?', id, (err, rows) => {
     if (err) {
-      console.error('Error al obtener usuario por ID:', err);
-      res.status(500).json({ error: 'Error al obtener usuario por ID: ' + err.message });
+      res.status(500).json({ error: err.message });
       return;
     }
     if (rows.length === 0) {
@@ -57,8 +53,7 @@ router.post('/users', (req, res) => {
     [nombre, app, apm, email, password, telefono, fn],
     (err, result) => {
       if (err) {
-        console.error('Error al crear un nuevo usuario:', err);
-        res.status(500).json({ error: 'Error al crear un nuevo usuario: ' + err.message });
+        res.status(500).json({ error: err.message });
         return;
       }
       res.json({ message: 'Usuario creado exitosamente', id: result.insertId });
@@ -75,8 +70,7 @@ router.put('/users/:id', (req, res) => {
     [nombre, app, apm, email, password, telefono, fn, id],
     (err, result) => {
       if (err) {
-        console.error('Error al actualizar un usuario:', err);
-        res.status(500).json({ error: 'Error al actualizar un usuario: ' + err.message });
+        res.status(500).json({ error: err.message });
         return;
       }
       res.json({ message: 'Usuario actualizado exitosamente' });
@@ -89,8 +83,7 @@ router.delete('/users/:id', (req, res) => {
   const id = req.params.id;
   db.query('DELETE FROM Users WHERE id_user = ?', id, (err, result) => {
     if (err) {
-      console.error('Error al eliminar un usuario:', err);
-      res.status(500).json({ error: 'Error al eliminar un usuario: ' + err.message });
+      res.status(500).json({ error: err.message });
       return;
     }
     res.json({ message: 'Usuario eliminado exitosamente' });
@@ -102,8 +95,7 @@ router.get('/users/:id/mediciones', (req, res) => {
   const id = req.params.id;
   db.query('SELECT * FROM consumptiondata WHERE id_user = ?', id, (err, rows) => {
     if (err) {
-      console.error('Error al obtener mediciones de consumo de un usuario:', err);
-      res.status(500).json({ error: 'Error al obtener mediciones de consumo de un usuario: ' + err.message });
+      res.status(500).json({ error: err.message });
       return;
     }
     res.json({ mediciones: rows });
@@ -119,8 +111,7 @@ router.post('/users/:id/mediciones', (req, res) => {
     [id, potencia, corriente],
     (err, result) => {
       if (err) {
-        console.error('Error al crear una nueva medición de consumo:', err);
-        res.status(500).json({ error: 'Error al crear una nueva medición de consumo: ' + err.message });
+        res.status(500).json({ error: err.message });
         return;
       }
       res.json({ message: 'Medición de consumo creada exitosamente', id: result.insertId });
@@ -138,8 +129,7 @@ router.put('/users/:userId/mediciones/:medicionId', (req, res) => {
     [potencia, corriente, medicionId, userId],
     (err, result) => {
       if (err) {
-        console.error('Error al actualizar una medición de consumo:', err);
-        res.status(500).json({ error: 'Error al actualizar una medición de consumo: ' + err.message });
+        res.status(500).json({ error: err.message });
         return;
       }
       res.json({ message: 'Medición de consumo actualizada exitosamente' });
@@ -156,8 +146,7 @@ router.delete('/users/:userId/mediciones/:medicionId', (req, res) => {
     [medicionId, userId],
     (err, result) => {
       if (err) {
-        console.error('Error al eliminar una medición de consumo:', err);
-        res.status(500).json({ error: 'Error al eliminar una medición de consumo: ' + err.message });
+        res.status(500).json({ error: err.message });
         return;
       }
       res.json({ message: 'Medición de consumo eliminada exitosamente' });
@@ -174,7 +163,7 @@ router.post('/api/mediciones', (req, res) => {
   db.query(query, [potencia, corriente], (error) => {
     if (error) {
       console.error('Error al agregar medición:', error);
-      res.status(500).json({ error: 'Error al agregar medición: ' + error.message });
+      res.status(500).json({ message: 'Error al agregar medición' });
     } else {
       res.status(201).json({ message: 'Medición agregada correctamente' });
     }
