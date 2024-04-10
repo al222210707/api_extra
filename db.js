@@ -6,11 +6,13 @@ const db = mysql.createConnection({
   password: '@Ye738292o9rjfs',
   database: 'u630845697_smartpower'
 });
+
 db.connect((err) => {
   if (err) {
-    
+    console.error('Error al conectar a la base de datos:', err);
+    return;
   }
-  console.log('MySQL connected');
+  console.log('Conexión a MySQL establecida correctamente');
 });
 
 module.exports = db;
